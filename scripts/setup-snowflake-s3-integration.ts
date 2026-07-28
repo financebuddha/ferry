@@ -177,14 +177,18 @@ async function main(): Promise<void> {
       if (!isNotFound(err)) throw err;
       markerCreated = true;
     }
-    await s3.send(
-      new PutObjectCommand({ Bucket: env.EXPORT_S3_BUCKET, Key: env.EXPORT_S3_PREFIX, Body: "" }),
-    );
-    info(`Prefix marker s3://${env.EXPORT_S3_BUCKET}/${env.EXPORT_S3_PREFIX} present`);
-    if (markerCreated && !bucketCreated) {
-      registerRollback(rollback, `Prefix marker ${env.EXPORT_S3_PREFIX}`, async () => {
-        await s3.send(new DeleteObjectCommand({ Bucket: env.EXPORT_S3_BUCKET, Key: env.EXPORT_S3_PREFIX }));
-      });
+    if (markerCreated) {
+      await s3.send(
+        new PutObjectCommand({ Bucket: env.EXPORT_S3_BUCKET, Key: env.EXPORT_S3_PREFIX, Body: "" }),
+      );
+      info(`Prefix marker s3://${env.EXPORT_S3_BUCKET}/${env.EXPORT_S3_PREFIX} present`);
+      if (!bucketCreated) {
+        registerRollback(rollback, `Prefix marker ${env.EXPORT_S3_PREFIX}`, async () => {
+          await s3.send(new DeleteObjectCommand({ Bucket: env.EXPORT_S3_BUCKET, Key: env.EXPORT_S3_PREFIX }));
+        });
+      }
+    } else {
+      info(`Prefix marker s3://${env.EXPORT_S3_BUCKET}/${env.EXPORT_S3_PREFIX} already present`);
     }
 
     step("Ensure IAM policy (artifact A)");
