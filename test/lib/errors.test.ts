@@ -46,4 +46,10 @@ describe("isAssumeRoleDenied", () => {
   test("returns false for unrelated errors so they are not silently retried", () => {
     expect(isAssumeRoleDenied({ name: "SyntaxError", message: "unexpected token" })).toBe(false);
   });
+
+  test("does not match an unrelated message that merely mentions 'assume' in passing", () => {
+    expect(
+      isAssumeRoleDenied({ name: "ValidationError", message: "let's assume the default region is correct" }),
+    ).toBe(false);
+  });
 });

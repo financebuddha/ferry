@@ -29,7 +29,9 @@ const s3TargetSchema = {
     (v) => !v.startsWith("s3://") && !v.endsWith("/"),
     "must be a bare bucket name — no s3:// prefix, no trailing slash",
   ),
-  EXPORT_S3_PREFIX: nonEmpty.refine((v) => v.endsWith("/"), "must end with '/'"),
+  EXPORT_S3_PREFIX: nonEmpty
+    .refine((v) => v.endsWith("/"), "must end with '/'")
+    .refine((v) => !/['\r\n]/.test(v), "must not contain quotes or newlines"),
 };
 
 const integrationEnvSchema = z

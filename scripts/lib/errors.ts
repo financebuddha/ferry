@@ -29,7 +29,8 @@ export function isAssumeRoleDenied(err: unknown): boolean {
   return (
     msg.includes("accessdenied") ||
     msg.includes("access denied") ||
-    msg.includes("assume") ||
+    msg.includes("sts:assumerole") ||
+    msg.includes("assume role") ||
     msg.includes("not authorized")
   );
 }

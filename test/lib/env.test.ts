@@ -87,6 +87,12 @@ describe("loadIntegrationEnv", () => {
     expect(exitCode).toBe(1);
   });
 
+  test("rejects an EXPORT_S3_PREFIX containing a quote (would break out of the SQL string literal it's interpolated into)", () => {
+    setEnv({ ...VALID_INTEGRATION_ENV, EXPORT_S3_PREFIX: "snow'flake/" });
+    expect(() => loadIntegrationEnv()).toThrow();
+    expect(exitCode).toBe(1);
+  });
+
   test("rejects an EXPORT_S3_BUCKET with an s3:// prefix", () => {
     setEnv({ ...VALID_INTEGRATION_ENV, EXPORT_S3_BUCKET: "s3://my-bucket" });
     expect(() => loadIntegrationEnv()).toThrow();
